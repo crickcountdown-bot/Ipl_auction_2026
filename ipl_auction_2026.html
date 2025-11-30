@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IPL Auction 2026 – Solo Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top left, #111827 0, #020617 45%, #020617 100%);
+      color: #e5e7eb;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #1f2937;
+      background: linear-gradient(to right, #020617dd, #0b1220dd);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+    }
+
+    .logo span {
+      color: #38bdf8;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 2.5rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.18rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid #334155;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #9ca3af;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.8fr);
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #111827 0, #020617 60%);
+      border-radius: 1rem;
+      border: 1px solid #1f2937;
+      padding: 1rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .card + .card {
+      margin-top: 0.9rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+      padding: 0.45rem 0.6rem;
+      border-radius: 0.6rem;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px #38bdf84d;
+    }
+
+    .row {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .row > div {
+      flex: 1 1 120px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(to right, #22c55e, #16a34a);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 12px 25px rgba(34, 197, 94, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 32px rgba(34, 197, 94, 0.45);
+      filter: brightness(1.05);
+    }
+
+    .btn-secondary {
+      background: #020617;
+      border: 1px solid #334155;
+      box-shadow: none;
+      color: #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.6);
+    }
+
+    .btn-danger {
+      background: linear-gradient(to right, #f97316, #dc2626);
+      box-shadow: 0 12px 25px rgba(239, 68, 68, 0.4);
+    }
+
+    .small {
+      font-size: 0.8rem;
+    }
+
+    .muted {
+      color: #6b7280;
+    }
+
+    .retained-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .retained-table th,
+    .retained-table td {
+      padding: 0.25rem 0.3rem;
+      border-bottom: 1px solid #1f2937;
+    }
+
+    .retained-table input {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.4rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.6rem;
+      margin-top: 0.6rem;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0.12rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      color: #e5e7eb;
+      margin-left: 0.35rem;
+    }
+
+    .team-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.3rem;
+      padding: 0.3rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      font-size: 0.75rem;
+      margin: 0.15rem;
+    }
+
+    .team-pill span.value {
+      color: #22c55e;
+    }
+
+    .squad-list {
+      margin-top: 0.4rem;
+      max-height: 170px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+      border-top: 1px dashed #1f2937;
+      padding-top: 0.3rem;
+    }
+
+    .squad-list div {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.18rem 0;
+    }
+
+    .squad-list span.price {
+      color: #22c55e;
+    }
+
+    .current-player-card {
+      border-radius: 0.9rem;
+      border: 1px solid #1f2937;
+      padding: 0.75rem 0.8rem;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 70%);
+      margin-bottom: 0.8rem;
+    }
+
+    .current-player-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .current-player-name {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      padding: 0.16rem 0.45rem;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      color: #e5e7eb;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.2rem;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .meta-row span {
+      margin-right: 0.3rem;
+    }
+
+    .bid-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed #1f2937;
+      font-size: 0.85rem;
+    }
+
+    .status {
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+      color: #9ca3af;
+    }
+
+    .teams-strip {
+      margin-top: 0.4rem;
+      font-size: 0.75rem;
+    }
+
+    .log-area {
+      font-size: 0.78rem;
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: 0.4rem;
+      padding: 0.4rem;
+      border-radius: 0.6rem;
+      border: 1px dashed #1f2937;
+      background: #020617;
+    }
+
+    .log-entry + .log-entry {
+      margin-top: 0.25rem;
+    }
+
+    .highlight {
+      color: #22c55e;
+    }
+
+    .unsold {
+      color: #f97316;
+    }
+
+    .footer {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="logo">IPL <span>AUCTION 2026</span></div>
+      <div class="tagline">Solo simulator • Retentions + purse management</div>
+    </div>
+    <div class="pill">Single Player Mode</div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <h1>IPL Auction 2026 – One Person Simulation</h1>
+    <p>
+      Choose your franchise, add retained players and simulate an IPL-style mini auction.
+      You control only <span class="highlight">one team</span>; other franchises are simulated.
+    </p>
+  </section>
+
+  <div class="layout">
+    <!-- LEFT SIDE: SETUP + YOUR TEAM -->
+    <div>
+      <!-- SETUP CARD -->
+      <div class="card" id="setup-card">
+        <h2>1. Setup Your Franchise</h2>
+        <p class="small muted">
+          Select your team, purse and optional retained players. Then start the auction.
+        </p>
+
+        <div class="row" style="margin-top:0.6rem;">
+          <div>
+            <label for="team-select">Your Team</label>
+            <select id="team-select">
+              <option value="MI">Mumbai Indians (MI)</option>
+              <option value="CSK">Chennai Super Kings (CSK)</option>
+              <option value="RCB">Royal Challengers Bengaluru (RCB)</option>
+              <option value="RR" selected>Rajasthan Royals (RR)</option>
+              <option value="KKR">Kolkata Knight Riders (KKR)</option>
+              <option value="SRH">Sunrisers Hyderabad (SRH)</option>
+              <option value="DC">Delhi Capitals (DC)</option>
+              <option value="PBKS">Punjab Kings (PBKS)</option>
+              <option value="GT">Gujarat Titans (GT)</option>
+              <option value="LSG">Lucknow Super Giants (LSG)</option>
+            </select>
+          </div>
+          <div>
+            <label for="purse-input">Total Purse (Cr)</label>
+            <input id="purse-input" type="number" min="10" step="0.5" value="100" />
+          </div>
+        </div>
+
+        <p class="small" style="margin-top:0.6rem;">
+          Optional: Add up to 5 retained players for your team. Their cost will be deducted from the purse.
+        </p>
+
+        <table class="retained-table">
+          <thead>
+          <tr class="muted">
+            <th style="width:40%;">Name</th>
+            <th style="width:25%;">Role</th>
+            <th style="width:20%;">Price (Cr)</th>
+          </tr>
+          </thead>
+          <tbody id="retained-body">
+          <!-- 5 empty rows -->
+          <tr>
+            <td><input data-retained="name" /></td>
+            <td><input data-retained="role" placeholder="BAT/BOW/AR/WK" /></td>
+            <td><input data-retained="price" type="number" step="0.25" min="0" /></td>
+          </tr>
+          <tr>
+            <td><input data-retained="name" /></td>
+            <td><input data-retained="role" placeholder="BAT/BOW/AR/WK" /></td>
+            <td><input data-retained="price" type="number" step="0.25" min="0" /></td>
+          </tr>
+          <tr>
+            <td><input data-retained="name" /></td>
+            <td><input data-retained="role" placeholder="BAT/BOW/AR/WK" /></td>
+            <td><input data-retained="price" type="number" step="0.25" min="0" /></td>
+          </tr>
+          <tr>
+            <td><input data-retained="name" /></td>
+            <td><input data-retained="role" placeholder="BAT/BOW/AR/WK" /></td>
+            <td><input data-retained="price" type="number" step="0.25" min="0" /></td>
+          </tr>
+          <tr>
+            <td><input data-retained="name" /></td>
+            <td><input data-retained="role" placeholder="BAT/BOW/AR/WK" /></td>
+            <td><input data-retained="price" type="number" step="0.25" min="0" /></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <div class="row" style="margin-top:0.8rem; align-items:center;">
+          <button class="btn" id="start-btn">Start Auction</button>
+          <button class="btn btn-secondary small" id="quick-fill-btn" type="button">
+            Quick example retention
+          </button>
+          <span class="small muted">
+            (You can still refresh page to reset everything.)
+          </span>
+        </div>
+      </div>
+
+      <!-- YOUR TEAM CARD -->
+      <div class="card" id="team-card" style="margin-top:1rem;">
+        <h2>Your Squad</h2>
+        <p class="small muted">
+          Track your remaining purse and built squad. Retentions are marked separately.
+        </p>
+
+        <div class="row" style="margin-top:0.6rem;">
+          <div>
+            <span class="small muted">Team</span><br />
+            <span id="team-name" class="highlight">–</span>
+          </div>
+          <div>
+            <span class="small muted">Remaining Purse</span><br />
+            <span id="team-purse" class="highlight">0 Cr</span>
+          </div>
+          <div>
+            <span class="small muted">Total Players</span><br />
+            <span id="team-players" class="highlight">0</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="small muted" style="margin-top:0.5rem;">Retained Players</div>
+            <div class="squad-list" id="retained-list">
+              <span class="small muted">No retained players yet.</span>
+            </div>
+          </div>
+          <div>
+            <div class="small muted" style="margin-top:0.5rem;">Auction Buys</div>
+            <div class="squad-list" id="auction-list">
+              <span class="small muted">Auction not started.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OTHER TEAMS CARD -->
+      <div class="card" style="margin-top:1rem;">
+        <h2>Other Franchises (AI)</h2>
+        <p class="small muted">
+          These teams bid automatically. You can’t control them, but you can try to beat their bids.
+        </p>
+        <div id="other-teams-strip" class="teams-strip"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: AUCTION ENGINE -->
+    <div>
+      <div class="card" id="auction-card">
+        <h2>2. Auction Room</h2>
+        <p class="small muted">
+          Decide if you want to aggressively chase the current player or let AI grab them.
+        </p>
+
+        <!-- Current player display -->
+        <div id="current-player" class="current-player-card">
+          <div class="current-player-header">
+            <div>
+              <div class="current-player-name" id="player-name">Auction not started</div>
+              <div class="meta-row">
+                <span id="player-role">–</span>
+                <span id="player-category">–</span>
+              </div>
+            </div>
+            <div>
+              <div class="chip">
+                Base: <span id="player-base">–</span> Cr
+              </div>
+              <div class="chip" style="margin-top:0.25rem;">
+                Player #<span id="player-index">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bid-row">
+            <div>
+              <div class="small muted">Highest Bid</div>
+              <div id="current-bid">–</div>
+            </div>
+            <div>
+              <div class="small muted">Leading Franchise</div>
+              <div id="current-leader">–</div>
+            </div>
+          </div>
+
+          <div class="status" id="status-text">
+            Click <span class="highlight">Start Auction</span> after setting up your team.
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="row" style="margin-bottom:0.4rem;">
+          <button class="btn small" id="btn-chase" disabled>
+            Chase this player (Aggressive)
+          </button>
+          <button class="btn btn-secondary small" id="btn-skip" disabled>
+            Skip / Low interest
+          </button>
+        </div>
+
+        <div class="row" style="margin-bottom:0.7rem;">
+          <button class="btn small" id="btn-run-auction" disabled>
+            Run auction for current player
+          </button>
+          <button class="btn btn-secondary small" id="btn-next-player" disabled>
+            Next player
+          </button>
+          <button class="btn btn-danger small" id="btn-reset" type="button">
+            Reset game (reload)
+          </button>
+        </div>
+
+        <p class="small muted">
+          Logic: Every team has a hidden interest level for each player. We simulate a sealed-bid auction.
+          If you choose to "Chase", your team’s maximum bid gets a boost (if purse allows).
+        </p>
+
+        <!-- Log -->
+        <div class="log-area" id="log">
+          <div class="log-entry small muted">
+            Auction log will appear here after you start.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Tip: Change players list in the script if you want to add real names for IPL 2026 rumours.
+  </div>
+</main>
+
+<script>
+  // ========== DATA SETUP ==========
+
+  const allTeams = ["MI", "CSK", "RCB", "RR", "KKR", "SRH", "DC", "PBKS", "GT", "LSG"];
+
+  // Simple sample player pool (you can edit these names)
+  const playersPool = [
+    { name: "Explosive Opener", role: "BAT", category: "Top Order", base: 2, rating: 0.9 },
+    { name: "Power Finisher", role: "BAT", category: "Middle Order", base: 1.5, rating: 0.85 },
+    { name: "Mystery Spinner", role: "BOW", category: "Spinner", base: 1, rating: 0.88 },
+    { name: "Death Over Specialist", role: "BOW", category: "Pacer", base: 2, rating: 0.92 },
+    { name: "Anchor Batter", role: "BAT", category: "Top Order", base: 0.75, rating: 0.78 },
+    { name: "Left-arm Quick", role: "BOW", category: "Pacer", base: 1.2, rating: 0.8 },
+    { name: "Leggie All-rounder", role: "AR", category: "All-rounder", base: 1.5, rating: 0.88 },
+    { name: "Spin-bowling All-rounder", role: "AR", category: "All-rounder", base: 1.25, rating: 0.84 },
+    { name: "Wicketkeeper Hitter", role: "WK", category: "Keeper-batter", base: 0.75, rating: 0.82 },
+    { name: "Young Indian Quick", role: "BOW", category: "Uncapped", base: 0.5, rating: 0.8 },
+    { name: "Uncapped Finisher", role: "BAT", category: "Uncapped", base: 0.4, rating: 0.76 },
+    { name: "Experienced Overseas BAT", role: "BAT", category: "Overseas", base: 1.5, rating: 0.9 },
+    { name: "Overseas Fast Bowler", role: "BOW", category: "Overseas", base: 1.5, rating: 0.9 },
+    { name: "Utility All-rounder", role: "AR", category: "All-rounder", base: 1, rating: 0.82 },
+    { name: "Backup Wicketkeeper", role: "WK", category: "Keeper-batter", base: 0.5, rating: 0.72 },
+    { name: "Mature Spinner", role: "BOW", category: "Spinner", base: 0.75, rating: 0.79 },
+    { name: "Middle-order Stabiliser", role: "BAT", category: "Middle Order", base: 0.6, rating: 0.77 },
+    { name: "Express Pace Option", role: "BOW", category: "Pacer", base: 1.3, rating: 0.86 },
+    { name: "Fielding Gun", role: "BAT", category: "Utility", base: 0.4, rating: 0.7 },
+    { name: "Future Star", role: "AR", category: "Uncapped", base: 0.5, rating: 0.83 }
+  ];
+
+  // Game state
+  let gameStarted = false;
+  let userTeam = null;
+  let userPurse = 0;
+  let userSquad = [];
+  let userRetained = [];
+  let otherTeams = [];
+  let currentPlayerIndex = -1;
+  let currentPlayer = null;
+  let userInterestBoost = 1.0;
+  let auctionResolvedForCurrent = false;
+
+  // DOM references
+  const teamNameEl = document.getElementById("team-name");
+  const teamPurseEl = document.getElementById("team-purse");
+  const teamPlayersEl = document.getElementById("team-players");
+  const retainedListEl = document.getElementById("retained-list");
+  const auctionListEl = document.getElementById("auction-list");
+  const otherTeamsStrip = document.getElementById("other-teams-strip");
+
+  const playerNameEl = document.getElementById("player-name");
+  const playerRoleEl = document.getElementById("player-role");
+  const playerCategoryEl = document.getElementById("player-category");
+  const playerBaseEl = document.getElementById("player-base");
+  const playerIndexEl = document.getElementById("player-index");
+  const currentBidEl = document.getElementById("current-bid");
+  const currentLeaderEl = document.getElementById("current-leader");
+  const statusTextEl = document.getElementById("status-text");
+
+  const logEl = document.getElementById("log");
+
+  const btnStart = document.getElementById("start-btn");
+  const btnQuickFill = document.getElementById("quick-fill-btn");
+  const btnChase = document.getElementById("btn-chase");
+  const btnSkip = document.getElementById("btn-skip");
+  const btnRunAuction = document.getElementById("btn-ru
